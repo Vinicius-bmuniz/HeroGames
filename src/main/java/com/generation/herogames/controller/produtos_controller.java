@@ -1,5 +1,6 @@
 package com.generation.herogames.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class produtos_controller {
 	}
 
 	@GetMapping ("preco/de{valor1}a{valor2}") //Colocar tratamento de erro.
-	public ResponseEntity<List<produtos_model>> getByValor (@PathVariable double valor1, @PathVariable double valor2){
+	public ResponseEntity<List<produtos_model>> getByValor (@PathVariable BigDecimal valor1, @PathVariable BigDecimal valor2){
 		return ResponseEntity.ok(produtosRepository.findAllByvalorBetween(valor1, valor2));
 	}
 	

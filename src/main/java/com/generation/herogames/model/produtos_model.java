@@ -1,5 +1,6 @@
 package com.generation.herogames.model;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 
 import javax.persistence.Entity;
@@ -32,11 +33,12 @@ public class produtos_model {
 	private String descricao;
 	
 	@NotNull
-	private double valor;
+	private BigDecimal valor;
 	
 	private int quantidade;
 	
-	@JsonFormat(pattern = "MM/yyyy")
+	//@Colum(name = "data") | Com isso podemos renomear a coluna
+	@JsonFormat(pattern = "mm/yyyy")
 	private Date data_lancamento;
 	
 	@NotNull
@@ -71,11 +73,11 @@ public class produtos_model {
 		this.descricao = descricao;
 	}
 
-	public double getValor() {
+	public BigDecimal getValor() {
 		return valor;
 	}
 
-	public void setValor(double valor) {
+	public void setValor(BigDecimal valor) {
 		this.valor = valor;
 	}
 
