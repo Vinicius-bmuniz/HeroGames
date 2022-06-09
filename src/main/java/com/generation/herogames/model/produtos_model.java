@@ -48,6 +48,7 @@ public class produtos_model {
 	@JsonIgnoreProperties("produtos")
 	private categorias_model categorias;
 	
+
 	// ===== Getters and Setters ===== //
 	public Long getId() {
 		return id;
