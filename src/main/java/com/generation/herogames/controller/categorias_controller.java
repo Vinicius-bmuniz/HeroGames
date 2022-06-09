@@ -18,12 +18,11 @@ import com.generation.herogames.model.categorias_model;
 import com.generation.herogames.repository.categorias_repository;
 
 @RestController
-@RequestMapping ("/categoria")
+@RequestMapping ("/categorias")
 public class categorias_controller {
 	
 	@Autowired
 	categorias_repository categoriasRepository;
-	
 	
 	@GetMapping
 	public ResponseEntity<List<categorias_model>> getAll (){
@@ -39,6 +38,9 @@ public class categorias_controller {
 	
 	@GetMapping("/nome/{nome}")
 	public ResponseEntity<List<categorias_model>> getByNome(@PathVariable String nome){
+		List<categorias_model> checarProd = categoriasRepository.findAllBynomeContainingIgnoreCase(nome);
+		if(checarProd.isEmpty())
+			return ResponseEntity.notFound().build();
 		return ResponseEntity.ok(categoriasRepository.findAllBynomeContainingIgnoreCase(nome));
 	}
 	
@@ -47,15 +49,20 @@ public class categorias_controller {
 		return ResponseEntity.ok(categoriasRepository.save(categoria));
 	}
 	
-	@PutMapping //Colocar tratamento de erro para não criar novo produto caso não exista
+	@PutMapping
 	public ResponseEntity<categorias_model> putCategoria(@RequestBody categorias_model categoria){
-		categoriasRepository.existsById(categoria.getId());
-		return ResponseEntity.status(HttpStatus.CREATED).body(categoriasRepository.save(categoria)); 
+		return categoriasRepository.findById(categoria.getId())
+				.map(resp -> ResponseEntity.status(HttpStatus.CREATED).body(categoriasRepository.save(categoria)))
+				.orElse(ResponseEntity.notFound().build()); 
 	}
 	
 	@DeleteMapping ("/{id}")
-	public ResponseEntity<categorias_model> deleteCategoria(@PathVariable Long id){
-		categoriasRepository.deleteById(id);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); 
+	public ResponseEntity<?> deleteCategoria(@PathVariable Long id){
+		return categoriasRepository.findById(id)
+				.map(resp -> {
+					categoriasRepository.deleteById(id);
+					return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+				})
+				.orElse (ResponseEntity.notFound().build());
 	}
 }

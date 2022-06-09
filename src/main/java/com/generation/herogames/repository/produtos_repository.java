@@ -13,7 +13,7 @@ import com.generation.herogames.model.produtos_model;
 public interface produtos_repository extends JpaRepository<produtos_model, Long>{
 
 	public List<produtos_model> findAllBynomeContainingIgnoreCase(@Param("nome")String nome);
-	public List<produtos_model> findAllByvalorGreaterThanEqual(@Param("valor") double valor);
-	public List<produtos_model> findAllByvalorLessThanEqual(@Param("valor") double valor);
-	public List<produtos_model> findAllByvalorBetween(BigDecimal valor1, BigDecimal valor2); //Recomendado bigdecimal
+	public List<produtos_model> findAllByvalorGreaterThanEqual(@Param("valor") BigDecimal valor);
+	public List<produtos_model> findAllByvalorLessThanEqual(@Param("valor") BigDecimal valor);
+	public List<produtos_model> findAllByvalorBetween(BigDecimal valor1, BigDecimal valor2);
 }
