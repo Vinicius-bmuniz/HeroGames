@@ -21,11 +21,11 @@ public class UsuarioService {
 
 	@Autowired
 	private usuarios_repository usuarioRepository;
-
 	
 	public Optional<usuario_model> cadastrarUsuario(usuario_model usuario) {
 		if (usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent())
-			return Optional.empty();
+			throw new ResponseStatusException(
+					HttpStatus.BAD_REQUEST, "E-mail já existente", null);
 		
 		if (calcularIdade(usuario.getDataNascimento()) < 18)
 			throw new ResponseStatusException(
@@ -35,7 +35,6 @@ public class UsuarioService {
 				usuario.setFoto("https://i.imgur.com/z5KHi8B.png");
 
 		usuario.setSenha(criptografarSenha(usuario.getSenha()));
-
 		return Optional.ofNullable(usuarioRepository.save(usuario));
 	}
 
@@ -43,9 +42,9 @@ public class UsuarioService {
 		if(usuarioRepository.findById(usuario.getId()).isPresent()) {
 			Optional<usuario_model> buscaUsuario = usuarioRepository.findByUsuario(usuario.getUsuario());
 			
-			if ( (buscaUsuario.isPresent()) && (buscaUsuario.get().getId() != usuario.getId()))
+			if ((buscaUsuario.isPresent()) && (buscaUsuario.get().getId() != usuario.getId()))
 				throw new ResponseStatusException(
-						HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
+						HttpStatus.BAD_REQUEST, "E-mail já existente", null);
 			
 			if (calcularIdade(usuario.getDataNascimento()) < 18)
 				throw new ResponseStatusException(
@@ -56,7 +55,6 @@ public class UsuarioService {
 			
 			usuario.setSenha(criptografarSenha(usuario.getSenha()));
 			return Optional.ofNullable(usuarioRepository.save(usuario));
-			
 		}
 		return Optional.empty();
 	}

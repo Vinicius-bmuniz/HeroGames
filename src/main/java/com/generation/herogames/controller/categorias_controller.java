@@ -18,12 +18,11 @@ import com.generation.herogames.model.categorias_model;
 import com.generation.herogames.repository.categorias_repository;
 
 @RestController
-@RequestMapping ("/categoria")
+@RequestMapping ("/categorias")
 public class categorias_controller {
 	
 	@Autowired
 	categorias_repository categoriasRepository;
-	
 	
 	@GetMapping
 	public ResponseEntity<List<categorias_model>> getAll (){
@@ -39,6 +38,9 @@ public class categorias_controller {
 	
 	@GetMapping("/nome/{nome}")
 	public ResponseEntity<List<categorias_model>> getByNome(@PathVariable String nome){
+		List<categorias_model> checarProd = categoriasRepository.findAllBynomeContainingIgnoreCase(nome);
+		if(checarProd.isEmpty())
+			return ResponseEntity.notFound().build();
 		return ResponseEntity.ok(categoriasRepository.findAllBynomeContainingIgnoreCase(nome));
 	}
 	
@@ -55,8 +57,12 @@ public class categorias_controller {
 	}
 	
 	@DeleteMapping ("/{id}")
-	public ResponseEntity<categorias_model> deleteCategoria(@PathVariable Long id){
-		categoriasRepository.deleteById(id);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); 
+	public ResponseEntity<?> deleteCategoria(@PathVariable Long id){
+		return categoriasRepository.findById(id)
+				.map(resp -> {
+					categoriasRepository.deleteById(id);
+					return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+				})
+				.orElse (ResponseEntity.notFound().build());
 	}
 }

@@ -34,6 +34,21 @@ public class usuarios_controller {
 	@Autowired
 	private usuarios_repository usuariosRepository;
 	
+	// ===== MÉTODOS SEM RESTRIÇÃO - AUTORIZADOS PELO BasicSecurityConfig ===== //
+	@PostMapping("/cadastro")
+	public ResponseEntity<usuario_model> cadastrar (@RequestBody usuario_model usuario){ 
+		return usuarioService.cadastrarUsuario(usuario)
+				.map (respostaCadastro -> ResponseEntity.status(HttpStatus.CREATED).body(respostaCadastro))
+				.orElse (ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+	}
+	
+	@PostMapping("/logar") 
+	public ResponseEntity<UsuarioLogin> logar (@RequestBody Optional<UsuarioLogin> usuarioLogin){
+		return usuarioService.autenticarUsuario(usuarioLogin)
+				.map(respostaLogin -> ResponseEntity.ok(respostaLogin))
+				.orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+	}	
+	
 	@GetMapping ("/all")
 	public ResponseEntity<List<usuario_model>> getAll (){
 		return ResponseEntity.ok(usuariosRepository.findAll());
@@ -46,31 +61,13 @@ public class usuarios_controller {
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	// === Esse método está autorizado pela BasicSecurityConfig === //
-	@PostMapping("/logar") 
-	public ResponseEntity<UsuarioLogin> logar (@RequestBody Optional<UsuarioLogin> usuarioLogin){
-		return usuarioService.autenticarUsuario(usuarioLogin)
-				.map(respostaLogin -> ResponseEntity.ok(respostaLogin))
-				.orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
-	}
-	
-	// === Esse método está autorizado pela BasicSecurityConfig === //
-	//Tem que ser uma ResponseEntity do tipo usuario_model pois iremos salvar isso no DB
-	@PostMapping("/cadastro")
-	public ResponseEntity<usuario_model> cadastrar (@RequestBody usuario_model usuario){ 
-		return usuarioService.cadastrarUsuario(usuario)
-				.map (respostaCadastro -> ResponseEntity.status(HttpStatus.CREATED).body(respostaCadastro))
-				.orElse (ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
-	}
-	/* Verificar o motivo de usuários poderem atualizar cadastro de terceiros.
-	 */
 	@PutMapping("/atualizar")
 	public ResponseEntity<usuario_model> atualizar (@Valid @RequestBody usuario_model usuario){
 		return usuarioService.atualizarUsuario(usuario)
 				.map(respostaAtualizada -> ResponseEntity.ok(respostaAtualizada))
 				.orElse(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
 	}
-	
+
 	/*
 	 * O método abaixo não faz a verificação se o usuario que está solicitando o Delete
 	 * É o mesmo usuário que está sendo deletado.

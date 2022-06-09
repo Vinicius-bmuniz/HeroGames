@@ -2,6 +2,7 @@ package com.generation.herogames.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.generation.herogames.model.categorias_model;
 import com.generation.herogames.model.produtos_model;
 import com.generation.herogames.repository.categorias_repository;
 import com.generation.herogames.repository.produtos_repository;
@@ -45,29 +47,43 @@ public class produtos_controller {
 	
 	@GetMapping("/nome/{nome}")
 	public ResponseEntity<List<produtos_model>> getProdutosByNome(@PathVariable String nome){
+		List<produtos_model> checarProd = produtosRepository.findAllBynomeContainingIgnoreCase(nome);
+		if(checarProd.isEmpty())
+			return ResponseEntity.notFound().build();
 		return ResponseEntity.ok(produtosRepository.findAllBynomeContainingIgnoreCase(nome));
 	}
 	
-	@GetMapping ("preco/maior{valor}") //Colocar tratamento de erro.
-	public ResponseEntity<List<produtos_model>> getProdutosByValorMaior (@PathVariable double valor){
+	@GetMapping ("preco/maior/{valor}")
+	public ResponseEntity<List<produtos_model>> getProdutosByValorMaior (@PathVariable BigDecimal valor){
+		List<produtos_model> checarProd = produtosRepository.findAllByvalorGreaterThanEqual(valor);
+		if(checarProd.isEmpty())
+			return ResponseEntity.notFound().build();
 		return ResponseEntity.ok(produtosRepository.findAllByvalorGreaterThanEqual(valor));
 	}
 	
-	@GetMapping ("preco/menor{valor}") //Colocar tratamento de erro.
-	public ResponseEntity<List<produtos_model>> getProdutosByValorMenor (@PathVariable double valor){
+	@GetMapping ("preco/menor/{valor}")
+	public ResponseEntity<List<produtos_model>> getProdutosByValorMenor (@PathVariable BigDecimal valor){
+		List<produtos_model> checarProd = produtosRepository.findAllByvalorLessThanEqual(valor);
+		if(checarProd.isEmpty())
+			return ResponseEntity.notFound().build();
 		return ResponseEntity.ok(produtosRepository.findAllByvalorLessThanEqual(valor));
 	}
 
-	@GetMapping ("preco/de{valor1}a{valor2}") //Colocar tratamento de erro.
+	@GetMapping ("between/{valor1}/{valor2}")
 	public ResponseEntity<List<produtos_model>> getProdutosBetween (@PathVariable BigDecimal valor1, @PathVariable BigDecimal valor2){
+		List<produtos_model> checarProd = produtosRepository.findAllByvalorBetween(valor1, valor2);
+		if(checarProd.isEmpty())
+			return ResponseEntity.notFound().build();
 		return ResponseEntity.ok(produtosRepository.findAllByvalorBetween(valor1, valor2));
 	}
 	
-	@PostMapping //Verificar como resolver erro ao não enviar o ID da categoria na requisição
+	@PostMapping //Verificar como resolver erro 500 ao não enviar o ID da categoria na requisição
 	public ResponseEntity<produtos_model> criarProduto(@RequestBody produtos_model produto){
-		return categoriasRepository.findById(produto.getCategorias().getId())
-				.map(save -> ResponseEntity.ok(produtosRepository.save(produto)))
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+		Optional<categorias_model> checarProd = categoriasRepository.findById(produto.getCategorias().getId());
+			if(checarProd.isPresent()) {
+				return ResponseEntity.status(HttpStatus.CREATED).body(produtosRepository.save(produto));
+		}
+		return ResponseEntity.badRequest().build();
 	}
 	
 	@PutMapping
@@ -80,10 +96,6 @@ public class produtos_controller {
 		return ResponseEntity.notFound().build();
 	}
 	
-	/* O método abaixo não faz a verificação se o usuario está solicitando o Delete
-	 * É o mesmo que criou o produto.
-	 * ADICIONAR POSTERIORMENTE
-	 */
 	@DeleteMapping ("/{id}")
 	public ResponseEntity<?> deleteProduto (@PathVariable Long id){
 		return produtosRepository.findById(id)
