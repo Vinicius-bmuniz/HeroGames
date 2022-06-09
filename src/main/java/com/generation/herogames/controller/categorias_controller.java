@@ -47,10 +47,11 @@ public class categorias_controller {
 		return ResponseEntity.ok(categoriasRepository.save(categoria));
 	}
 	
-	@PutMapping //Colocar tratamento de erro para não criar novo produto caso não exista
+	@PutMapping
 	public ResponseEntity<categorias_model> putCategoria(@RequestBody categorias_model categoria){
-		categoriasRepository.existsById(categoria.getId());
-		return ResponseEntity.status(HttpStatus.CREATED).body(categoriasRepository.save(categoria)); 
+		return categoriasRepository.findById(categoria.getId())
+				.map(resp -> ResponseEntity.status(HttpStatus.CREATED).body(categoriasRepository.save(categoria)))
+				.orElse(ResponseEntity.notFound().build()); 
 	}
 	
 	@DeleteMapping ("/{id}")

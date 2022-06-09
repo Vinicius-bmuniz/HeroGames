@@ -38,7 +38,7 @@ public class produtos_model {
 	private int quantidade;
 	
 	//@Colum(name = "data") | Com isso podemos renomear a coluna
-	@JsonFormat(pattern = "mm/yyyy")
+	@JsonFormat(pattern = "MM/YYYY")
 	private Date data_lancamento;
 	
 	@NotNull

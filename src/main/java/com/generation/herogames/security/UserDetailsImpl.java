@@ -6,16 +6,17 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.generation.herogames.model.Usuario;
+import com.generation.herogames.model.usuario_model;
 
 public class UserDetailsImpl implements UserDetails {
+	
 	private static final long serialVersionUID = 1L;
 
 	private String userName;
 	private String password;
 	private List<GrantedAuthority> authorities;
 
-	public UserDetailsImpl(Usuario usuario) {
+	public UserDetailsImpl(usuario_model usuario) { //Alterado o nome da classe
 		this.userName = usuario.getUsuario();
 		this.password = usuario.getSenha();
 	}
@@ -27,6 +28,7 @@ public class UserDetailsImpl implements UserDetails {
 		return authorities;
 	}
 
+	
 	@Override
 	public String getPassword() {
 		return password;
@@ -34,7 +36,6 @@ public class UserDetailsImpl implements UserDetails {
 
 	@Override
 	public String getUsername() {
-
 		return userName;
 	}
 
@@ -47,7 +48,7 @@ public class UserDetailsImpl implements UserDetails {
 	public boolean isAccountNonLocked() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;

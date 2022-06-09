@@ -35,7 +35,7 @@ public class usuario_model {
 	private String senha;
 	
 	@Column (name = "data_nascimento")
-	@JsonFormat (pattern = "dd/MM/YYYY")
+	@JsonFormat (pattern = "yyyy-MM-dd")
 	@NotNull (message = "A data de nascimento é obrigatória!")
 	private LocalDate dataNascimento;
 	

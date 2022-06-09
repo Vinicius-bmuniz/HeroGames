@@ -31,60 +31,66 @@ public class produtos_controller {
 	@Autowired
 	private categorias_repository categoriasRepository;
 	
-	@GetMapping
-	public ResponseEntity<List<produtos_model>> getAll (){
+	@GetMapping("/all")
+	public ResponseEntity<List<produtos_model>> getAllProdutos (){
 		return ResponseEntity.ok(produtosRepository.findAll());
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<produtos_model> getById(@PathVariable Long id){
+	public ResponseEntity<produtos_model> getProdutosById(@PathVariable Long id){
 		return produtosRepository.findById(id)
 				.map(resp -> ResponseEntity.ok(resp))
 				.orElse (ResponseEntity.notFound().build());
 	}
 	
 	@GetMapping("/nome/{nome}")
-	public ResponseEntity<List<produtos_model>> getByNome(@PathVariable String nome){
+	public ResponseEntity<List<produtos_model>> getProdutosByNome(@PathVariable String nome){
 		return ResponseEntity.ok(produtosRepository.findAllBynomeContainingIgnoreCase(nome));
 	}
 	
 	@GetMapping ("preco/maior{valor}") //Colocar tratamento de erro.
-	public ResponseEntity<List<produtos_model>> getByValorMaior (@PathVariable double valor){
+	public ResponseEntity<List<produtos_model>> getProdutosByValorMaior (@PathVariable double valor){
 		return ResponseEntity.ok(produtosRepository.findAllByvalorGreaterThanEqual(valor));
 	}
 	
 	@GetMapping ("preco/menor{valor}") //Colocar tratamento de erro.
-	public ResponseEntity<List<produtos_model>> getByValorMenor (@PathVariable double valor){
+	public ResponseEntity<List<produtos_model>> getProdutosByValorMenor (@PathVariable double valor){
 		return ResponseEntity.ok(produtosRepository.findAllByvalorLessThanEqual(valor));
 	}
 
 	@GetMapping ("preco/de{valor1}a{valor2}") //Colocar tratamento de erro.
-	public ResponseEntity<List<produtos_model>> getByValor (@PathVariable BigDecimal valor1, @PathVariable BigDecimal valor2){
+	public ResponseEntity<List<produtos_model>> getProdutosBetween (@PathVariable BigDecimal valor1, @PathVariable BigDecimal valor2){
 		return ResponseEntity.ok(produtosRepository.findAllByvalorBetween(valor1, valor2));
 	}
 	
 	@PostMapping //Verificar como resolver erro ao não enviar o ID da categoria na requisição
-	public ResponseEntity<produtos_model> postProduto(@RequestBody produtos_model produto){
+	public ResponseEntity<produtos_model> criarProduto(@RequestBody produtos_model produto){
 		return categoriasRepository.findById(produto.getCategorias().getId())
 				.map(save -> ResponseEntity.ok(produtosRepository.save(produto)))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@PutMapping //Colocar tratamento de erro para não criar novo produto caso não exista
-	public ResponseEntity<produtos_model> putProduto(@RequestBody produtos_model produto){
-		if (produtosRepository.existsById(produto.getId()) && categoriasRepository.existsById(produto.getCategorias().getId()) ) {
-			return ResponseEntity.status(HttpStatus.CREATED).body(produtosRepository.save(produto));
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();			
-		} 
+	@PutMapping
+	public ResponseEntity<produtos_model> editarProduto(@RequestBody produtos_model produto){
+		if(produtosRepository.existsById(produto.getId())) {
+			return categoriasRepository.findById(produto.getCategorias().getId())
+					.map(respo -> ResponseEntity.status(HttpStatus.OK).body(produtosRepository.save(produto)))
+					.orElse(ResponseEntity.badRequest().build());
+		}
+		return ResponseEntity.notFound().build();
 	}
 	
+	/* O método abaixo não faz a verificação se o usuario está solicitando o Delete
+	 * É o mesmo que criou o produto.
+	 * ADICIONAR POSTERIORMENTE
+	 */
 	@DeleteMapping ("/{id}")
-	public ResponseEntity<produtos_model> deleteProduto(@PathVariable Long id){
-		if (produtosRepository.existsById(id)) 
-			produtosRepository.deleteById(id);
-		
-	return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); 
-	
+	public ResponseEntity<?> deleteProduto (@PathVariable Long id){
+		return produtosRepository.findById(id)
+				.map(delProduto -> {
+					produtosRepository.deleteById(id);
+					return ResponseEntity.ok(delProduto);
+				})
+				.orElse(ResponseEntity.notFound().build());
 }
 }
