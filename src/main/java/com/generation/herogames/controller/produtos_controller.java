@@ -21,6 +21,7 @@ import com.generation.herogames.model.categorias_model;
 import com.generation.herogames.model.produtos_model;
 import com.generation.herogames.repository.categorias_repository;
 import com.generation.herogames.repository.produtos_repository;
+import com.generation.herogames.service.ProdutoService;
 
 @RestController
 @CrossOrigin (origins = "*", allowedHeaders = "*")
@@ -32,6 +33,9 @@ public class produtos_controller {
 	
 	@Autowired
 	private categorias_repository categoriasRepository;
+	
+	@Autowired
+	private ProdutoService produtoService;
 	
 	@GetMapping("/all")
 	public ResponseEntity<List<produtos_model>> getAllProdutos (){
@@ -105,4 +109,19 @@ public class produtos_controller {
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
+	
+	@PutMapping("/curtir/{id}")
+	public ResponseEntity<produtos_model> curtir (@PathVariable Long id) {
+		return produtoService.curtir(id)
+				.map(resp -> ResponseEntity.ok(resp))
+				.orElse(ResponseEntity.badRequest().build());
+	}
+	
+	@PutMapping("/descurtir/{id}")
+	public ResponseEntity<produtos_model> descurtir (@PathVariable Long id) {
+		return produtoService.descurtir(id)
+				.map(resp -> ResponseEntity.ok(resp))
+				.orElse(ResponseEntity.badRequest().build());
+	}
+	
 }

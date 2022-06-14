@@ -3,6 +3,7 @@ package com.generation.herogames.model;
 import java.math.BigDecimal;
 import java.sql.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,6 +38,9 @@ public class produtos_model {
 	
 	private int quantidade;
 	
+	@Column (columnDefinition = "integer default 0")
+	private int curtir;
+	
 	//@Colum(name = "data") | Com isso podemos renomear a coluna
 	@JsonFormat(pattern = "MM/YYYY")
 	private Date data_lancamento;
@@ -50,6 +54,7 @@ public class produtos_model {
 	
 
 	// ===== Getters and Setters ===== //
+	
 	public Long getId() {
 		return id;
 	}
@@ -112,6 +117,14 @@ public class produtos_model {
 
 	public void setCategorias(categorias_model categorias) {
 		this.categorias = categorias;
+	}
+
+	public int getCurtir() {
+		return curtir;
+	}
+
+	public void setCurtir(int curtir) {
+		this.curtir = curtir;
 	}
 }
 
