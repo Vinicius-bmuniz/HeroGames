@@ -53,6 +53,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
 	<!-- Dependência Spring Security | implementar sistema de segurança-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -63,7 +64,11 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 		</dependency>
-		
+	<!-- Dependência Commons Codec | Codigicar nosso token de acesso -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
