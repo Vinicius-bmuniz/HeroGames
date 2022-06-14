@@ -104,5 +104,5 @@ public class produtos_controller {
 					return ResponseEntity.ok(delProduto);
 				})
 				.orElse(ResponseEntity.notFound().build());
-}
+	}
 }
